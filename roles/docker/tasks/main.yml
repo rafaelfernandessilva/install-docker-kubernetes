@@ -1,0 +1,34 @@
+---
+- name: Instalando Docker
+  shell: curl -fsSL https://get.docker.com | bash
+  args:
+    warn: no
+
+- name: Copiando arquivo de configuração Docker
+  become: true
+  shell: |
+    cat > /etc/docker/daemon.json <<EOF
+    {
+      "exec-opts": ["native.cgroupdriver=systemd"],
+      "log-driver": "json-file",
+      "log-opts": {
+        "max-size": "100m"
+      },
+      "storage-driver": "overlay2"
+    }
+    EOF
+  args:
+    chdir: /etc/docker
+    executable: /bin/bash
+
+- name: Criando diretorio systemd
+  become: true
+  shell: mkdir -p /etc/systemd/system/docker.service.d
+  args:
+    warn: no
+
+- name: Reiniciando serviço Docker
+  become: true
+  shell: |
+    systemctl daemon-reload
+    systemctl restart docker

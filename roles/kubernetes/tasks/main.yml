@@ -1,0 +1,36 @@
+- name: Adicionando chave
+  shell: curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
+  args:
+    warn: no
+
+- name: Adicionando repositorio
+  shell: sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
+  args:
+    warn: no
+
+- name: Atualizando Pacotes
+  apt: 
+    update_cache: yes
+  become: true
+
+- name: Atualizando Servidores
+  apt: 
+    upgrade: dist
+  become: true
+  
+- name: Instalando Kubernetes
+  apt:
+    name: "{{ item  }}"
+  become: true
+  loop:
+    - bash-completion
+    - kubeadm
+    - kubelet
+    - kubectl
+
+- name: Ativando autocomplete Kubernetes
+  shell: |
+    kubectl completion bash > /etc/bash_completion.d/kubectl
+    source <(kubectl completion bash)
+  args:
+    executable: /bin/bash

@@ -1,0 +1,38 @@
+- name: Baixando Imagens
+  shell: kubeadm config images pull
+  become: true
+
+- name:  Iniciando cluster Kuber init
+  shell: kubeadm init
+  become: true
+
+- name: Copiando arquivos e criando pastas
+  shell: |
+    mkdir -p $HOME/.kube
+    sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+    sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: Carregando modulos necessarios
+  become: true
+  shell: |
+    sudo modprobe br_netfilter ip_vs_rr ip_vs_wrr ip_vs_sh nf_conntrack_ipv4 ip_vs
+  args:
+    executable: /bin/bash
+  
+
+- name: pod-network
+  shell: 
+    cmd: kubectl apply -f "https://cloud.weave.works/k8s/net?k8s-version=$(kubectl version | base64 | tr -d '\n')"
+  args:
+    executable: /bin/bash
+  become: true
+
+- name: gerando token
+  shell: sudo kubeadm token create --print-join-command > join.sh
+  args:
+    chdir: /tmp
+    creates: join.sh
+  become: true

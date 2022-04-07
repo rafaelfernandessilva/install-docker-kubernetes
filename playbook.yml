@@ -1,0 +1,13 @@
+---
+- hosts: all
+  roles:
+   - docker
+   - kubernetes
+
+- hosts: main
+  roles:
+   - k8s-main
+
+- hosts: node
+  roles:
+   - k8s-node

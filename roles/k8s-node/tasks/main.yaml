@@ -1,0 +1,12 @@
+#- name: copiando token-node
+#  copy:
+#    src: /tmp/join.sh
+#    dest: /tmp/join.sh
+#  become: true
+#
+#
+#- name: Adicionando nodes
+#  shell:
+#    cmd: bash join.sh
+#    chdir: /tmp
+#  become: true
